@@ -9,12 +9,30 @@
     "cta": "Jouer"
   },
   {
+    "id": "duels",
+    "title": "Duel de calcul",
+    "desc": "Seul ou jusqu'à 3 joueurs : le plus rapide gagne le point !",
+    "url": "https://xeroxytb.github.io/duels/",
+    "color": "#ffd93d",
+    "icon": "star",
+    "cta": "Jouer"
+  },
+  {
+    "id": "calendar",
+    "title": "Calendrier de l'Avent",
+    "desc": "Ouvre une case par jour et découvre la surprise.",
+    "url": "https://xeroxytb2.github.io/Calender/",
+    "color": "#ff5c8a",
+    "icon": "star",
+    "cta": "Ouvrir"
+  },
+  {
     "id": "me",
-    "title": "Me Webstite",
+    "title": "Mon site",
     "desc": "Mon site de présentation",
     "url": "https://xeroxytb.github.io/me/",
     "color": "#3ddc97",
-    "icon": "CodeSigns",
+    "icon": "star",
     "cta": "Visiter"
   }
 ]
