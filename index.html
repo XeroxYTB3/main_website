@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fffdf5">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='13' y='14' width='82' height='80' rx='22' fill='%233ddc97'/%3E%3Crect x='6' y='7' width='82' height='80' rx='22' fill='%23fffdf5' stroke='%231d1b2e' stroke-width='6'/%3E%3Crect x='20' y='54' width='54' height='16' rx='6' fill='%23ffd93d' transform='rotate(-3 47 62)'/%3E%3Cpath d='M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z' fill='%231d1b2e' fill-rule='evenodd' transform='translate(-3 0)'/%3E%3C/svg%3E">
 <title>Mes projets</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,7 +107,7 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
   a.card:hover,a.card:focus-visible{transform:rotate(var(--r))}
 }
 
-/* ===== écran de chargement (dessiné au feutre) ===== */
+/* ===== écran de chargement (style doodle : barre rayée) ===== */
 body.loading{overflow:hidden}
 #loader{
   position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
@@ -118,38 +119,20 @@ body.loading{overflow:hidden}
 #loader::before{content:"";position:absolute;top:0;bottom:0;left:max(10px,calc(50% - 500px));width:3px;background:var(--margin);opacity:.7}
 #loader[hidden]{display:none}
 #loader.done{opacity:0;transform:scale(1.03);pointer-events:none}
-.lwrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 20px}
-.lball{width:150px;height:150px;overflow:visible;filter:url(#rough)}
-.lring{fill:none;stroke:var(--pink);stroke-width:7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:draw100 .9s ease-out forwards}
-.lfill{fill:var(--ink);opacity:0;animation:fadein .35s .8s forwards}
-.lwhite{fill:#fff;opacity:0;transform-origin:64px 58px;animation:pop .35s 1.05s cubic-bezier(.3,1.6,.5,1) forwards}
-.l8{font-family:var(--marker);font-size:26px;fill:var(--ink);opacity:0;transform-origin:64px 58px;animation:pop .35s 1.15s cubic-bezier(.3,1.6,.5,1) forwards}
-.ltext{margin:6px 0 0;font-family:var(--marker);font-size:1.7rem;color:var(--ink);text-align:center;transform:rotate(-1.5deg)}
-.dots i{font-style:normal;opacity:.2;animation:blink 1.2s infinite}
+.lwrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 20px}
+.llogo{width:128px;height:128px;overflow:visible;filter:url(#rough);transform-origin:50% 60%;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.ltext{margin:6px 0 0;font-family:var(--marker);font-size:1.9rem;color:var(--ink);text-align:center;transform:rotate(-1.5deg)}
+.dots i{font-style:normal;color:var(--pink);animation:blink 1.2s infinite}
 .dots i:nth-child(2){animation-delay:.2s}
 .dots i:nth-child(3){animation-delay:.4s}
-.lline{position:relative;width:260px;height:40px;margin-top:4px}
-.lline svg{display:block;width:260px;height:40px;overflow:visible}
-.lline path{fill:none;stroke:var(--yellow);stroke-width:7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:scribble 1.8s ease-in-out infinite}
-.lpen{
-  position:absolute;left:0;top:0;width:40px;height:40px;
-  offset-path:path("M4 24 C 30 6, 50 40, 80 22 S 130 8, 160 24 S 220 38, 256 18");
-  offset-anchor:6px 36px;offset-rotate:0deg;animation:pen 1.8s ease-in-out infinite;
-}
-.lpen svg{width:40px;height:40px;display:block}
-@keyframes draw100{to{stroke-dashoffset:0}}
-@keyframes fadein{to{opacity:1}}
-@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
-@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-@keyframes scribble{0%{stroke-dashoffset:100;opacity:1}75%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
-@keyframes pen{0%{offset-distance:0%;opacity:1}75%{offset-distance:100%;opacity:1}100%{offset-distance:100%;opacity:0}}
+.lbar{width:min(360px,82vw)}
+.lbar svg{display:block;width:100%;height:auto;overflow:visible;filter:url(#rough)}
+@keyframes pop{from{opacity:0;transform:scale(.4) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes blink{0%,80%,100%{opacity:.15}40%{opacity:1}}
 @media (prefers-reduced-motion:reduce){
   #loader{transition:none}
-  .lring{animation:none;stroke-dashoffset:0}
-  .lfill,.lwhite,.l8{animation:none;opacity:1;transform:none}
-  .lline path{animation:none;stroke-dashoffset:0}
-  .lpen{display:none}
-  .dots i{animation:none;opacity:1}
+  .llogo{animation:none}
+  .dots i{animation:none}
 }
 </style>
 </head>
@@ -161,26 +144,31 @@ body.loading{overflow:hidden}
     <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
     <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
   </filter>
+  <filter id="rough2" x="-3%" y="-3%" width="106%" height="106%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8"/>
+  </filter>
 </svg>
 
 <div id="loader" role="status" aria-live="polite">
   <div class="lwrap">
-    <svg class="lball" viewBox="0 0 130 130" aria-hidden="true">
-      <circle class="lfill" cx="64" cy="64" r="44"/>
-      <path class="lring" pathLength="100" d="M70 10 C 104 8 124 40 118 72 C 112 106 78 124 46 112 C 16 100 6 62 22 38 C 34 20 52 12 78 14"/>
-      <circle class="lwhite" cx="64" cy="58" r="19"/>
-      <text class="l8" x="64" y="67" text-anchor="middle">8</text>
-    </svg>
-    <p class="ltext"><span id="loaderText">Chargement</span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
-    <div class="lline" aria-hidden="true">
-      <svg viewBox="0 0 260 40"><path pathLength="100" d="M4 24 C 30 6, 50 40, 80 22 S 130 8, 160 24 S 220 38, 256 18"/></svg>
-      <span class="lpen">
-        <svg viewBox="0 0 40 40">
-          <path d="M8 32 L28 12 L34 18 L14 38 Z" fill="#ff5c8a" stroke="#1d1b2e" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M28 12 L32 8 L38 14 L34 18 Z" fill="#ffd93d" stroke="#1d1b2e" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M8 32 L14 38 L5 38 Z" fill="#1d1b2e"/>
-        </svg>
-      </span>
+    <svg class="llogo" viewBox="0 0 100 100" aria-hidden="true"><defs><pattern id="pst" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="skewX(-22)"><rect width="12" height="12" fill="#ff5c8a"/><rect width="2.4" height="12" fill="#fffdf5"/></pattern></defs><rect x="15" y="20" width="78" height="76" rx="20" fill="#3ddc97"/><rect x="8" y="13" width="78" height="76" rx="20" fill="#fffdf5" stroke="#1d1b2e" stroke-width="3.5"/><rect x="15" y="20" width="64" height="62" rx="13" fill="none" stroke="#1d1b2e" stroke-width="1.6"/><rect x="22" y="56" width="52" height="15" rx="6" fill="#ffd93d" transform="rotate(-3 48 63)"/><path d="M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z" fill="url(#pst)" fill-rule="evenodd" stroke="#1d1b2e" stroke-width="2.4" stroke-linejoin="round" transform="translate(1.5 7) scale(.9)"/><rect x="28" y="4" width="38" height="14" rx="5" fill="#3ddc97" fill-opacity=".6" stroke="#1d1b2e" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="1.5 3.5" transform="rotate(-4 47 11)"/></svg>
+    <p class="ltext"><span>Chargement</span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
+    <div class="lbar" aria-hidden="true">
+      <svg viewBox="0 0 346 52">
+        <defs>
+          <pattern id="gaps" width="17" height="24" patternUnits="userSpaceOnUse" patternTransform="skewX(-22)">
+            <rect width="17" height="24" fill="#ff5c8a"/><rect x="0" width="4" height="24" fill="#fffdf5"/>
+          </pattern>
+          <clipPath id="inner"><rect x="11" y="11" width="318" height="24" rx="3.5"/></clipPath>
+          <clipPath id="front"><polygon id="lClip" points="0,0 0,0 0,0"/></clipPath>
+        </defs>
+        <rect x="8" y="8" width="336" height="42" rx="9" fill="#3ddc97"/>
+        <rect x="2" y="2" width="336" height="42" rx="9" fill="#fffdf5" stroke="#1d1b2e" stroke-width="3"/>
+        <rect x="8" y="8" width="324" height="30" rx="5.5" fill="none" stroke="#1d1b2e" stroke-width="1.6"/>
+        <g clip-path="url(#inner)"><g clip-path="url(#front)"><rect x="-10" y="11" width="360" height="24" fill="url(#gaps)"/></g></g>
+        <rect x="11" y="11" width="318" height="24" rx="3.5" fill="none" stroke="#1d1b2e" stroke-width="1.4" stroke-opacity=".5"/>
+      </svg>
     </div>
   </div>
 </div>
@@ -240,33 +228,76 @@ var grid = document.getElementById('grid');
 var empty = document.getElementById('empty');
 var find = document.getElementById('find');
 
-/* ===== écran de chargement ===== */
+/* ===== écran de chargement : barre tracée au feutre, 1,3 s minimum ===== */
 var loader = document.getElementById('loader');
-var loaderText = document.getElementById('loaderText');
-var started = Date.now();
+var clipEl = document.getElementById('lClip');
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var MIN_MS = reduce ? 300 : 1800; // durée minimale pour voir le dessin
+var MIN_MS = reduce ? 300 : 1300; // durée minimale du tracé
+var raf = 0, opening = false;
 
-function showLoader(text) {
-  loaderText.textContent = text;
+// paliers irréguliers : le coloriage avance par à-coups, comme à la main
+var STEPS = (function () {
+  var a = [0], v = 0;
+  while (v < 0.97) { v += 0.025 + Math.random() * 0.07; a.push(Math.min(v, 1)); }
+  a.push(1);
+  return a;
+})();
+var shown = 0;
+
+function setProgress(p) {
+  if (p < 0.002) { clipEl.setAttribute('points', '0,0 0,0 0,0'); return; }
+  var xf = 11 + p * 326; // bord avant incliné comme les rayures
+  clipEl.setAttribute('points', '11,11 ' + (xf + 4).toFixed(1) + ',11 ' + (xf - 4).toFixed(1) + ',35 11,35');
+}
+function showLoader() {
   loader.hidden = false;
   loader.classList.remove('done');
   document.body.classList.add('loading');
+  shown = 0;
+  setProgress(0);
 }
 function hideLoader() {
   loader.classList.add('done');
   document.body.classList.remove('loading');
   setTimeout(function () { if (loader.classList.contains('done')) loader.hidden = true; }, 500);
 }
+// colorie en MIN_MS minimum ; attend "ready" avant de dépasser 92 %
+function runLoader(ready, onEnd) {
+  cancelAnimationFrame(raf);
+  showLoader();
+  var t0 = performance.now(), ok = false;
+  var go = function () { ok = true; };
+  ready.then(go, go);
+  (function tick(now) {
+    var t = Math.min(1, (now - t0) / MIN_MS);
+    var target = Math.min(t, ok ? 1 : 0.92);
+    var thr = 0;
+    for (var i = 0; i < STEPS.length; i++) if (STEPS[i] <= target) thr = STEPS[i];
+    if (reduce) shown = target;
+    else {
+      shown += (thr - shown) * 0.4;           // petit coup de feutre rapide
+      if (thr - shown < 0.002) shown = thr;
+    }
+    setProgress(shown);
+    if (shown >= 0.999) { setProgress(1); setTimeout(onEnd, reduce ? 0 : 200); return; }
+    raf = requestAnimationFrame(tick);
+  })(t0);
+}
 function onProjectClick(e) {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   e.preventDefault();
-  var a = e.currentTarget;
-  showLoader('Ouverture de ' + a.querySelector('.name').textContent);
-  setTimeout(function () { window.location.href = a.href; }, reduce ? 100 : 1100);
+  if (opening) return;
+  opening = true;
+  var href = e.currentTarget.href;
+  // pendant que la barre se trace, on précharge la page du jeu (4 s max)
+  var warm = Promise.race([
+    fetch(href).then(function (r) { return r.text(); }),
+    new Promise(function (r) { setTimeout(r, 4000); })
+  ]);
+  runLoader(warm, function () { window.location.href = href; });
 }
 // retour arrière du navigateur : on ne laisse pas l'écran de chargement affiché
-window.addEventListener('pageshow', function (e) { if (e.persisted) hideLoader(); });
+window.addEventListener('pageshow', function (e) { if (e.persisted) { opening = false; cancelAnimationFrame(raf); hideLoader(); } });
 
 function el(tag, cls, text) {
   var e = document.createElement(tag);
@@ -333,9 +364,7 @@ var fontsReady = Promise.race([
   document.fonts ? document.fonts.ready : Promise.resolve(),
   new Promise(function (r) { setTimeout(r, 2500); })
 ]);
-Promise.all([sitesReady, fontsReady]).then(function () {
-  setTimeout(hideLoader, Math.max(0, MIN_MS - (Date.now() - started)));
-});
+runLoader(Promise.all([sitesReady, fontsReady]), hideLoader);
 </script>
 </body>
 </html>
