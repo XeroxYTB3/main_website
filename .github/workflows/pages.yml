@@ -28,6 +28,8 @@ jobs:
         run: node scripts/sync.mjs
       - name: Récupérer les favicons
         run: node scripts/icons.mjs
+      - name: Protéger les jeux (garde anti-copie)
+        run: node scripts/protect.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
