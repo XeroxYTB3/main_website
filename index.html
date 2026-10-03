@@ -76,6 +76,8 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
 
 .icon{width:92px;height:92px;margin:0 0 4px -4px;display:flex;align-items:center;justify-content:center;font-size:3.2rem}
 .icon svg{width:100%;height:100%;overflow:visible}
+/* vrai favicon du site */
+.fav{width:76px;height:76px;object-fit:contain;border-radius:16px;display:block}
 .name{font-family:var(--marker);font-weight:400;font-size:1.8rem;line-height:1.1;margin:0}
 .desc{margin:0;flex:1;color:var(--soft);font-size:1.25rem;line-height:1.3}
 .go{
@@ -203,7 +205,9 @@ body.loading{overflow:hidden}
 <script>
 /* Les projets viennent du fichier sites.json (même dossier que ce fichier).
    Chaque projet : id (nom du dossier), title, desc, url (site déployé),
-   color, icon ("ball8" ou "star") ou emoji, cta (texte du bouton).        */
+   color, cta (texte du bouton).
+   Icône : "favicon" (ajouté automatiquement au déploiement par scripts/icons.mjs),
+   sinon repli sur icon ("ball8" ou "star") ou emoji.                       */
 var PROJECTS = [];
 
 var ICONS = {
@@ -322,9 +326,21 @@ function render() {
     a.style.setProperty('--c', p.color || '#4aa8ff');
     a.style.setProperty('--r', ROT[i % ROT.length] + 'deg');
 
+    // icône : vrai favicon du site, sinon repli sur l'icône dessinée / l'emoji
     var icon = el('div', 'icon');
-    if (p.icon && ICONS[p.icon]) icon.innerHTML = ICONS[p.icon];
-    else icon.textContent = p.emoji || '⭐';
+    var fallback = function () {
+      icon.innerHTML = '';
+      if (p.icon && ICONS[p.icon]) icon.innerHTML = ICONS[p.icon];
+      else icon.textContent = p.emoji || '⭐';
+    };
+    if (p.favicon) {
+      var img = new Image();
+      img.className = 'fav';
+      img.alt = '';
+      img.onerror = fallback;
+      img.src = './' + p.favicon;
+      icon.appendChild(img);
+    } else fallback();
 
     a.appendChild(icon);
     a.appendChild(el('h2', 'name', p.title || p.id));
