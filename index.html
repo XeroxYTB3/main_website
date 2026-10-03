@@ -130,8 +130,13 @@ body.playing{overflow:hidden}
 #pList[hidden]{display:none}
 #pList button{width:100%;text-align:left;padding:8px 14px;border:0;border-radius:14px;background:none;color:var(--ink);font:inherit;cursor:pointer}
 #pList button:hover,#pList button:focus-visible{background:var(--yellow);outline:none}
-.stage{flex:1;min-height:0;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
-.stage iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+.stage{position:relative;flex:1;min-height:0;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+.stage:fullscreen{border:0;border-radius:0;box-shadow:none;background:#000}
+.stage:-webkit-full-screen{border:0;border-radius:0;box-shadow:none;background:#000}
+.stage.pfs{position:fixed;inset:0;z-index:60;border:0;border-radius:0;box-shadow:none}
+.pexit{position:absolute;top:calc(8px + env(safe-area-inset-top));right:8px;z-index:2;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);font-size:1.2rem;cursor:pointer;opacity:.85;padding:0}
+.pexit[hidden]{display:none}
 .pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 6px}
 .pinfo{display:flex;align-items:center;gap:12px;min-width:0}
 .pico{flex:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
@@ -253,6 +258,7 @@ body.loading{overflow:hidden}
   </div>
   <div class="stage" id="stage">
     <iframe id="pFrame" title="Projet" allow="fullscreen; autoplay; clipboard-write; gamepad" allowfullscreen></iframe>
+    <button class="pexit" id="pExit" type="button" aria-label="Quitter le plein écran" hidden>✕</button>
   </div>
   <div class="pbar">
     <div class="pinfo"><span class="pico" id="pIco"></span><strong id="pName"></strong></div>
@@ -476,6 +482,8 @@ function openProject(id) {
 }
 function closePlayer() {
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  stage.classList.remove('pfs');
+  pExit.hidden = true;
   frame.src = 'about:blank';
   player.hidden = true;
   document.body.classList.remove('playing');
@@ -521,12 +529,43 @@ pShare.addEventListener('click', function () {
     setTimeout(function () { pShare.classList.remove('ok'); }, 1200);
   }, function () {});
 });
-// plein écran : masqué là où le navigateur ne le permet pas (iPhone)
-if (!stage.requestFullscreen) pFs.hidden = true;
-pFs.addEventListener('click', function () {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else stage.requestFullscreen().catch(function () {});
-});
+/* plein écran : vrai plein écran si le navigateur le permet, sinon le cadre remplit la fenêtre */
+var pExit = document.getElementById('pExit');
+function fsActive() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement) || stage.classList.contains('pfs');
+}
+function fsPoke() { // le jeu recalcule sa taille une fois le plein écran établi
+  [60, 300].forEach(function (ms) {
+    setTimeout(function () {
+      try { frame.contentWindow.dispatchEvent(new Event('resize')); } catch (e) {}
+    }, ms);
+  });
+}
+function enterFs() {
+  var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+  var fallback = function () { stage.classList.add('pfs'); pExit.hidden = false; fsPoke(); };
+  if (!req) { fallback(); return; }
+  try {
+    var r = req.call(stage);
+    if (r && r.catch) r.catch(fallback);
+  } catch (e) { fallback(); }
+}
+function exitFs() {
+  if (stage.classList.contains('pfs')) { stage.classList.remove('pfs'); pExit.hidden = true; fsPoke(); return; }
+  var ex = document.exitFullscreen || document.webkitExitFullscreen;
+  if (ex) ex.call(document);
+}
+pFs.addEventListener('click', function () { if (fsActive()) exitFs(); else enterFs(); });
+pExit.addEventListener('click', exitFs);
+['fullscreenchange', 'webkitfullscreenchange'].forEach(function (n) { document.addEventListener(n, fsPoke); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && stage.classList.contains('pfs')) exitFs(); });
+
+/* dissuasion : pas de clic droit, ni F12 / Ctrl+S / Ctrl+U / Ctrl+Maj+I (contournable, voir scripts/protect.mjs) */
+addEventListener('contextmenu', function (e) { e.preventDefault(); }, true);
+addEventListener('keydown', function (e) {
+  var k = (e.key || '').toLowerCase(), c = e.ctrlKey || e.metaKey;
+  if (k === 'f12' || (c && k.length === 1 && 'sup'.indexOf(k) > -1) || (c && e.shiftKey && k.length === 1 && 'ijc'.indexOf(k) > -1)) e.preventDefault();
+}, true);
 
 var sitesReady = fetch('sites.json', { cache: 'no-cache' })
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
