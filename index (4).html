@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fffdf5">
+<title>Mes projets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fffdf5; --ink:#1d1b2e; --soft:#3b3956; --grid:#cfe3f3; --margin:#ff8aa8;
+  --pink:#ff5c8a; --yellow:#ffd93d;
+  --marker:"Permanent Marker","Segoe Print","Comic Sans MS",cursive;
+  --hand:"Patrick Hand","Segoe Print","Comic Sans MS",cursive;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; color:var(--ink); font-family:var(--hand); font-size:1.2rem;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
+  background-size:32px 32px;
+}
+/* marge rouge du cahier */
+body::before{content:"";position:fixed;top:0;bottom:0;left:max(10px,calc(50% - 500px));width:3px;background:var(--margin);opacity:.7;pointer-events:none}
+.wrap{position:relative;max-width:920px;margin:0 auto;padding:0 28px}
+
+header{padding:clamp(40px,9vh,90px) 0 8px;position:relative}
+h1{
+  display:inline-block; margin:0; font-family:var(--marker); font-weight:400;
+  font-size:clamp(3rem,11vw,6.2rem); line-height:1.05; transform:rotate(-2deg);
+}
+.hl{padding:0 .22em;border-radius:.3em;background:linear-gradient(transparent 52%,var(--yellow) 52% 90%,transparent 90%)}
+.under{display:block;width:min(460px,86%);height:26px;margin:2px 0 0 4px}
+.under path{fill:none;stroke:var(--pink);stroke-width:7;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1s .3s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sub{display:flex;align-items:center;gap:12px;margin:22px 0 0;font-size:1.5rem;color:var(--soft);transform:rotate(-1deg)}
+.sub svg{flex:none;width:54px;height:46px}
+.star{position:absolute;right:2%;top:clamp(24px,6vh,60px);width:clamp(54px,12vw,96px);transform:rotate(14deg)}
+
+.find{
+  display:none;width:100%;max-width:420px;margin:26px 0 0;padding:12px 22px;border:3px solid var(--ink);border-radius:999px;
+  background:#fff;color:var(--ink);font:inherit;font-size:1.3rem;
+}
+.find:focus{outline:3px solid var(--pink);outline-offset:2px}
+.find.on{display:block}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:52px 34px;padding:56px 0 72px;margin:0;list-style:none}
+
+/* ===== cartes très arrondies ===== */
+.card{
+  --c:#3ddc97; --r:-1.5deg;
+  position:relative;isolation:isolate;display:flex;flex-direction:column;gap:8px;height:100%;
+  padding:38px 28px 28px;color:var(--ink);text-decoration:none;
+  transform:rotate(var(--r));transition:transform .2s ease;
+}
+.card::before{
+  content:"";position:absolute;inset:0;z-index:-1;background:#fff;border:3px solid var(--ink);
+  border-radius:46px 38px 50px 38px/38px 50px 38px 46px;
+  box-shadow:7px 8px 0 var(--c);filter:url(#rough);transition:box-shadow .2s ease;
+}
+/* scotch arrondi */
+.card::after{
+  content:"";position:absolute;top:-15px;left:50%;width:96px;height:30px;z-index:1;border-radius:12px;
+  transform:translateX(-50%) rotate(-4deg);
+  background:color-mix(in srgb,var(--c) 55%,transparent);
+  border-left:3px dotted rgba(29,27,46,.25);border-right:3px dotted rgba(29,27,46,.25);
+}
+a.card:hover,a.card:focus-visible{transform:rotate(0deg) translateY(-6px);outline:none}
+a.card:hover::before,a.card:focus-visible::before{box-shadow:11px 13px 0 var(--c)}
+a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
+
+.icon{width:92px;height:92px;margin:0 0 4px -4px;display:flex;align-items:center;justify-content:center;font-size:3.2rem}
+.icon svg{width:100%;height:100%;overflow:visible}
+.name{font-family:var(--marker);font-weight:400;font-size:1.8rem;line-height:1.1;margin:0}
+.desc{margin:0;flex:1;color:var(--soft);font-size:1.25rem;line-height:1.3}
+.go{
+  position:relative;isolation:isolate;align-self:flex-start;margin-top:12px;padding:7px 24px;
+  font-family:var(--marker);font-size:1.05rem;
+}
+.go::before{
+  content:"";position:absolute;inset:0;z-index:-1;background:var(--c);border:2.5px solid var(--ink);
+  border-radius:999px;filter:url(#rough);
+}
+
+/* carte "bientôt" */
+.card.soon{--r:1.4deg}
+.card.soon::before{background:transparent;border-style:dashed;box-shadow:none}
+.card.soon::after{display:none}
+.card.soon .name{color:var(--soft)}
+.q{font-family:var(--marker);font-size:3.4rem;line-height:1;color:var(--pink);transform:rotate(-8deg);margin:0 0 4px 6px}
+
+.empty{padding:20px 0;color:var(--soft)}
+
+@media (max-width:520px){
+  .wrap{padding:0 22px}
+  .star{display:none}
+  .grid{gap:48px 24px}
+}
+@media (prefers-reduced-motion:reduce){
+  .under path{animation:none;stroke-dashoffset:0}
+  .card,.card::before{transition:none}
+  a.card:hover,a.card:focus-visible{transform:rotate(var(--r))}
+}
+</style>
+</head>
+<body>
+
+<!-- filtre : traits légèrement tremblés, comme dessinés à la main -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
+  </filter>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1><span class="hl">Mes projets</span></h1>
+    <svg class="under" viewBox="0 0 420 26" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M4 15 C 40 3, 70 25, 112 13 S 192 5, 232 15 S 322 23, 362 11 S 410 9, 416 13"/>
+    </svg>
+    <p class="sub">
+      <svg viewBox="0 0 54 46" aria-hidden="true">
+        <path d="M6 8 C 14 28, 24 34, 40 36" fill="none" stroke="#1d1b2e" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M28 26 L41 36 L25 41" fill="none" stroke="#1d1b2e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Choisis un projet pour commencer.</span>
+    </p>
+    <svg class="star" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M50 10 L61 38 L91 40 L68 60 L76 90 L50 73 L24 90 L32 60 L9 40 L39 38 Z"
+            fill="#ffd93d" stroke="#1d1b2e" stroke-width="4" stroke-linejoin="round" filter="url(#rough)"/>
+    </svg>
+    <input class="find" id="find" type="search" placeholder="Rechercher un projet" aria-label="Rechercher un projet" autocomplete="off">
+  </header>
+
+  <main>
+    <ul class="grid" id="grid"></ul>
+    <p class="empty" id="empty" hidden>Aucun projet ne correspond à ta recherche.</p>
+  </main>
+</div>
+
+<script>
+/* Les projets viennent du fichier sites.json (même dossier que ce fichier).
+   Chaque projet : id (nom du dossier), title, desc, url (site déployé),
+   color, icon ("ball8" ou "star") ou emoji, cta (texte du bouton).        */
+var PROJECTS = [];
+
+var ICONS = {
+  ball8:
+    '<svg viewBox="0 0 92 92" aria-hidden="true">' +
+    '<path d="M8 46c0-20 15-34 33-32 20 2 32 18 30 36-2 20-18 31-36 29C20 77 8 63 8 46z" fill="var(--c)" opacity=".6"/>' +
+    '<g filter="url(#rough)">' +
+    '<circle cx="46" cy="46" r="32" fill="#1d1b2e"/>' +
+    '<circle cx="46" cy="41" r="14" fill="#fff"/>' +
+    '<text x="46" y="47" text-anchor="middle" font-size="19" fill="#1d1b2e" style="font-family:var(--marker)">8</text>' +
+    '<path d="M26 30 C 29 24, 35 20, 42 18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/>' +
+    '</g></svg>',
+  star:
+    '<svg viewBox="0 0 92 92" aria-hidden="true">' +
+    '<path d="M8 46c0-20 15-34 33-32 20 2 32 18 30 36-2 20-18 31-36 29C20 77 8 63 8 46z" fill="var(--c)" opacity=".6"/>' +
+    '<path d="M46 10 L55 35 L82 37 L61 54 L68 80 L46 66 L24 80 L31 54 L10 37 L37 35 Z" fill="#ffd93d" stroke="#1d1b2e" stroke-width="3.5" stroke-linejoin="round" filter="url(#rough)"/>' +
+    '</svg>'
+};
+var ROT = [-1.6, 1.3, -0.8, 1.8, -1.2, 0.9];
+
+var grid = document.getElementById('grid');
+var empty = document.getElementById('empty');
+var find = document.getElementById('find');
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
+}
+
+function render() {
+  var t = find.value.trim().toLowerCase();
+  var shown = PROJECTS.filter(function (p) {
+    return ((p.title || p.id) + ' ' + (p.desc || '')).toLowerCase().indexOf(t) !== -1;
+  });
+  grid.innerHTML = '';
+  empty.hidden = shown.length > 0;
+
+  shown.forEach(function (p, i) {
+    var li = el('li');
+    var a = el('a', 'card');
+    a.href = './' + p.id + '/';
+    a.style.setProperty('--c', p.color || '#4aa8ff');
+    a.style.setProperty('--r', ROT[i % ROT.length] + 'deg');
+
+    var icon = el('div', 'icon');
+    if (p.icon && ICONS[p.icon]) icon.innerHTML = ICONS[p.icon];
+    else icon.textContent = p.emoji || '⭐';
+
+    a.appendChild(icon);
+    a.appendChild(el('h2', 'name', p.title || p.id));
+    a.appendChild(el('p', 'desc', p.desc || ''));
+    a.appendChild(el('span', 'go', p.cta || 'Ouvrir'));
+    li.appendChild(a);
+    grid.appendChild(li);
+  });
+
+  // carte "bientôt" (masquée pendant une recherche)
+  if (!t) {
+    var li2 = el('li');
+    var s = el('div', 'card soon');
+    s.appendChild(el('div', 'q', '?'));
+    s.appendChild(el('h2', 'name', 'Bientôt'));
+    s.appendChild(el('p', 'desc', 'Un nouveau projet arrive prochainement.'));
+    li2.appendChild(s);
+    grid.appendChild(li2);
+  }
+}
+
+find.addEventListener('input', render);
+fetch('sites.json', { cache: 'no-cache' })
+  .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(function (list) {
+    PROJECTS = list;
+    if (PROJECTS.length > 6) find.classList.add('on');
+    render();
+  })
+  .catch(function () {
+    grid.innerHTML = '';
+    empty.textContent = 'Impossible de charger la liste des projets (sites.json).';
+    empty.hidden = false;
+  });
+</script>
+</body>
+</html>
