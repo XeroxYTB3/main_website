@@ -109,6 +109,44 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
   a.card:hover,a.card:focus-visible{transform:rotate(var(--r))}
 }
 
+/* ===== lecteur : le projet s'ouvre dans un cadre (barre du haut, cadre, barre du bas) ===== */
+body.playing{overflow:hidden}
+#player{
+  --c:#3ddc97;
+  position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;gap:12px;
+  padding:calc(10px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
+  background-size:32px 32px;
+}
+#player[hidden]{display:none}
+.ptop{display:flex;align-items:center;gap:16px}
+.plogo{display:flex;align-items:center;gap:10px;flex:none;border:0;background:none;padding:0;color:var(--ink);font-family:var(--marker);font-size:1.4rem;cursor:pointer}
+.plogo svg{width:44px;height:44px}
+.psearch{position:relative;flex:1;max-width:520px;margin:0 auto}
+.psearch input{width:100%;padding:9px 20px;border:3px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:1.1rem}
+.psearch input:focus{outline:3px solid var(--pink);outline-offset:2px}
+#pList{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:5;margin:0;padding:6px;list-style:none;background:#fff;border:3px solid var(--ink);border-radius:20px}
+#pList[hidden]{display:none}
+#pList button{width:100%;text-align:left;padding:8px 14px;border:0;border-radius:14px;background:none;color:var(--ink);font:inherit;cursor:pointer}
+#pList button:hover,#pList button:focus-visible{background:var(--yellow);outline:none}
+.stage{flex:1;min-height:0;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
+.stage iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+.pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 6px}
+.pinfo{display:flex;align-items:center;gap:12px;min-width:0}
+.pico{flex:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+.pico img{width:100%;height:100%;object-fit:contain;border-radius:10px}
+.pico svg{width:100%;height:100%}
+#pName{font-family:var(--marker);font-weight:400;font-size:1.4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbtns{display:flex;gap:10px;flex:none}
+.pb{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);cursor:pointer;padding:0}
+.pb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pb:hover,.pb:focus-visible{background:var(--yellow);outline:none}
+.pb.on{background:var(--pink);color:#fff}
+.pb.on svg{fill:currentColor}
+.pb.ok{background:var(--c)}
+@media (max-width:520px){.plogo span{display:none}.ptop{gap:10px}}
+
 /* ===== écran de chargement (style doodle : barre rayée) ===== */
 body.loading{overflow:hidden}
 #loader{
@@ -202,6 +240,31 @@ body.loading{overflow:hidden}
   </main>
 </div>
 
+<div id="player" hidden>
+  <div class="ptop">
+    <button class="plogo" id="pHome" type="button" aria-label="Retour aux projets">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="10" y="10" width="80" height="80" rx="22" fill="#3ddc97" stroke="#1d1b2e" stroke-width="6"/><path d="M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z" fill="#1d1b2e" fill-rule="evenodd"/></svg>
+      <span>Mes projets</span>
+    </button>
+    <div class="psearch">
+      <input id="pFind" type="search" placeholder="Rechercher un projet" aria-label="Rechercher un projet" autocomplete="off">
+      <ul id="pList" hidden></ul>
+    </div>
+  </div>
+  <div class="stage" id="stage">
+    <iframe id="pFrame" title="Projet" allow="fullscreen; autoplay; clipboard-write; gamepad" allowfullscreen></iframe>
+  </div>
+  <div class="pbar">
+    <div class="pinfo"><span class="pico" id="pIco"></span><strong id="pName"></strong></div>
+    <div class="pbtns">
+      <button class="pb" id="pShare" type="button" aria-label="Copier le lien"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
+      <button class="pb" id="pLike" type="button" aria-label="J'aime"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.6 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg></button>
+      <button class="pb" id="pFs" type="button" aria-label="Plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="pb" id="pClose" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* Les projets viennent du fichier sites.json (même dossier que ce fichier).
    Chaque projet : id (nom du dossier), title, desc, url (site déployé),
@@ -292,13 +355,13 @@ function onProjectClick(e) {
   e.preventDefault();
   if (opening) return;
   opening = true;
-  var href = e.currentTarget.href;
+  var href = e.currentTarget.href, id = e.currentTarget.dataset.id;
   // pendant que la barre se trace, on précharge la page du jeu (4 s max)
   var warm = Promise.race([
     fetch(href).then(function (r) { return r.text(); }),
     new Promise(function (r) { setTimeout(r, 4000); })
   ]);
-  runLoader(warm, function () { window.location.href = href; });
+  runLoader(warm, function () { opening = false; location.hash = id; hideLoader(); });
 }
 // retour arrière du navigateur : on ne laisse pas l'écran de chargement affiché
 window.addEventListener('pageshow', function (e) { if (e.persisted) { opening = false; cancelAnimationFrame(raf); hideLoader(); } });
@@ -326,21 +389,11 @@ function render() {
     a.style.setProperty('--c', p.color || '#4aa8ff');
     a.style.setProperty('--r', ROT[i % ROT.length] + 'deg');
 
+    a.dataset.id = p.id;
+
     // icône : vrai favicon du site, sinon repli sur l'icône dessinée / l'emoji
     var icon = el('div', 'icon');
-    var fallback = function () {
-      icon.innerHTML = '';
-      if (p.icon && ICONS[p.icon]) icon.innerHTML = ICONS[p.icon];
-      else icon.textContent = p.emoji || '⭐';
-    };
-    if (p.favicon) {
-      var img = new Image();
-      img.className = 'fav';
-      img.alt = '';
-      img.onerror = fallback;
-      img.src = './' + p.favicon;
-      icon.appendChild(img);
-    } else fallback();
+    fillIcon(icon, p, 'fav');
 
     a.appendChild(icon);
     a.appendChild(el('h2', 'name', p.title || p.id));
@@ -364,12 +417,124 @@ function render() {
 
 find.addEventListener('input', render);
 
+/* icône d'un projet : vrai favicon, sinon repli sur l'icône dessinée / l'emoji */
+function fillIcon(box, p, cls) {
+  var fallback = function () {
+    box.innerHTML = '';
+    if (p.icon && ICONS[p.icon]) box.innerHTML = ICONS[p.icon];
+    else box.textContent = p.emoji || '⭐';
+  };
+  box.innerHTML = '';
+  if (p.favicon) {
+    var img = new Image();
+    img.className = cls;
+    img.alt = '';
+    img.onerror = fallback;
+    img.src = './' + p.favicon;
+    box.appendChild(img);
+  } else fallback();
+}
+
+/* ===== lecteur : le projet s'ouvre dans un cadre, l'adresse devient  #id ===== */
+var player = document.getElementById('player');
+var stage = document.getElementById('stage');
+var frame = document.getElementById('pFrame');
+var pName = document.getElementById('pName');
+var pIco = document.getElementById('pIco');
+var pFind = document.getElementById('pFind');
+var pList = document.getElementById('pList');
+var pLike = document.getElementById('pLike');
+var pShare = document.getElementById('pShare');
+var pFs = document.getElementById('pFs');
+var current = null;
+
+function byId(id) {
+  for (var i = 0; i < PROJECTS.length; i++) if (PROJECTS[i].id === id) return PROJECTS[i];
+  return null;
+}
+function syncLike() {
+  var on = false;
+  try { on = localStorage.getItem('like:' + current.id) === '1'; } catch (e) {}
+  pLike.classList.toggle('on', on);
+}
+function openProject(id) {
+  var p = byId(id);
+  if (!p) return false;
+  current = p;
+  player.style.setProperty('--c', p.color || '#3ddc97');
+  pName.textContent = p.title || p.id;
+  fillIcon(pIco, p, 'fav');
+  frame.title = p.title || p.id;
+  frame.src = './' + p.id + '/';
+  syncLike();
+  pFind.value = '';
+  pList.hidden = true;
+  player.hidden = false;
+  document.body.classList.add('playing');
+  document.title = (p.title || p.id) + ' – Mes projets';
+  return true;
+}
+function closePlayer() {
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  frame.src = 'about:blank';
+  player.hidden = true;
+  document.body.classList.remove('playing');
+  document.title = 'Mes projets';
+  current = null;
+}
+function fromHash() {
+  var id = decodeURIComponent(location.hash.slice(1));
+  if (id && openProject(id)) return;
+  closePlayer();
+}
+window.addEventListener('hashchange', fromHash);
+
+document.getElementById('pHome').addEventListener('click', function () { location.hash = ''; });
+document.getElementById('pClose').addEventListener('click', function () { location.hash = ''; });
+
+pFind.addEventListener('input', function () {
+  var t = pFind.value.trim().toLowerCase();
+  pList.innerHTML = '';
+  var hits = t ? PROJECTS.filter(function (p) {
+    return ((p.title || p.id) + ' ' + (p.desc || '')).toLowerCase().indexOf(t) !== -1;
+  }) : [];
+  hits.forEach(function (p) {
+    var li = el('li');
+    var b = el('button', null, p.title || p.id);
+    b.type = 'button';
+    b.addEventListener('click', function () { location.hash = p.id; });
+    li.appendChild(b);
+    pList.appendChild(li);
+  });
+  pList.hidden = hits.length === 0;
+});
+
+pLike.addEventListener('click', function () {
+  var on = !pLike.classList.contains('on');
+  try { localStorage.setItem('like:' + current.id, on ? '1' : '0'); } catch (e) {}
+  pLike.classList.toggle('on', on);
+});
+pShare.addEventListener('click', function () {
+  if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+  navigator.clipboard.writeText(location.href).then(function () {
+    pShare.classList.add('ok');
+    setTimeout(function () { pShare.classList.remove('ok'); }, 1200);
+  }, function () {});
+});
+// plein écran : masqué là où le navigateur ne le permet pas (iPhone)
+if (!stage.requestFullscreen) pFs.hidden = true;
+pFs.addEventListener('click', function () {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else stage.requestFullscreen().catch(function () {});
+});
+
 var sitesReady = fetch('sites.json', { cache: 'no-cache' })
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(function (list) {
     PROJECTS = list;
     if (PROJECTS.length > 6) find.classList.add('on');
     render();
+    if (location.hash.length > 1) fromHash();
   })
   .catch(function () {
     grid.innerHTML = '';
