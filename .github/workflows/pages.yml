@@ -26,6 +26,8 @@ jobs:
           node-version: 20
       - name: Récupérer les sites listés dans sites.json
         run: node scripts/sync.mjs
+      - name: Récupérer les favicons
+        run: node scripts/icons.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
