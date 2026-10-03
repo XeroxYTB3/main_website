@@ -105,9 +105,55 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
   .card,.card::before{transition:none}
   a.card:hover,a.card:focus-visible{transform:rotate(var(--r))}
 }
+
+/* ===== écran de chargement (dessiné au feutre) ===== */
+body.loading{overflow:hidden}
+#loader{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
+  background-size:32px 32px;
+  transition:opacity .45s ease,transform .45s ease;
+}
+#loader::before{content:"";position:absolute;top:0;bottom:0;left:max(10px,calc(50% - 500px));width:3px;background:var(--margin);opacity:.7}
+#loader[hidden]{display:none}
+#loader.done{opacity:0;transform:scale(1.03);pointer-events:none}
+.lwrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 20px}
+.lball{width:150px;height:150px;overflow:visible;filter:url(#rough)}
+.lring{fill:none;stroke:var(--pink);stroke-width:7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:draw100 .9s ease-out forwards}
+.lfill{fill:var(--ink);opacity:0;animation:fadein .35s .8s forwards}
+.lwhite{fill:#fff;opacity:0;transform-origin:64px 58px;animation:pop .35s 1.05s cubic-bezier(.3,1.6,.5,1) forwards}
+.l8{font-family:var(--marker);font-size:26px;fill:var(--ink);opacity:0;transform-origin:64px 58px;animation:pop .35s 1.15s cubic-bezier(.3,1.6,.5,1) forwards}
+.ltext{margin:6px 0 0;font-family:var(--marker);font-size:1.7rem;color:var(--ink);text-align:center;transform:rotate(-1.5deg)}
+.dots i{font-style:normal;opacity:.2;animation:blink 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.2s}
+.dots i:nth-child(3){animation-delay:.4s}
+.lline{position:relative;width:260px;height:40px;margin-top:4px}
+.lline svg{display:block;width:260px;height:40px;overflow:visible}
+.lline path{fill:none;stroke:var(--yellow);stroke-width:7;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:scribble 1.8s ease-in-out infinite}
+.lpen{
+  position:absolute;left:0;top:0;width:40px;height:40px;
+  offset-path:path("M4 24 C 30 6, 50 40, 80 22 S 130 8, 160 24 S 220 38, 256 18");
+  offset-anchor:6px 36px;offset-rotate:0deg;animation:pen 1.8s ease-in-out infinite;
+}
+.lpen svg{width:40px;height:40px;display:block}
+@keyframes draw100{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+@keyframes scribble{0%{stroke-dashoffset:100;opacity:1}75%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes pen{0%{offset-distance:0%;opacity:1}75%{offset-distance:100%;opacity:1}100%{offset-distance:100%;opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  #loader{transition:none}
+  .lring{animation:none;stroke-dashoffset:0}
+  .lfill,.lwhite,.l8{animation:none;opacity:1;transform:none}
+  .lline path{animation:none;stroke-dashoffset:0}
+  .lpen{display:none}
+  .dots i{animation:none;opacity:1}
+}
 </style>
 </head>
-<body>
+<body class="loading">
 
 <!-- filtre : traits légèrement tremblés, comme dessinés à la main -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -116,6 +162,29 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
     <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
   </filter>
 </svg>
+
+<div id="loader" role="status" aria-live="polite">
+  <div class="lwrap">
+    <svg class="lball" viewBox="0 0 130 130" aria-hidden="true">
+      <circle class="lfill" cx="64" cy="64" r="44"/>
+      <path class="lring" pathLength="100" d="M70 10 C 104 8 124 40 118 72 C 112 106 78 124 46 112 C 16 100 6 62 22 38 C 34 20 52 12 78 14"/>
+      <circle class="lwhite" cx="64" cy="58" r="19"/>
+      <text class="l8" x="64" y="67" text-anchor="middle">8</text>
+    </svg>
+    <p class="ltext"><span id="loaderText">Chargement</span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
+    <div class="lline" aria-hidden="true">
+      <svg viewBox="0 0 260 40"><path pathLength="100" d="M4 24 C 30 6, 50 40, 80 22 S 130 8, 160 24 S 220 38, 256 18"/></svg>
+      <span class="lpen">
+        <svg viewBox="0 0 40 40">
+          <path d="M8 32 L28 12 L34 18 L14 38 Z" fill="#ff5c8a" stroke="#1d1b2e" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M28 12 L32 8 L38 14 L34 18 Z" fill="#ffd93d" stroke="#1d1b2e" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M8 32 L14 38 L5 38 Z" fill="#1d1b2e"/>
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
+<noscript><style>#loader{display:none}</style></noscript>
 
 <div class="wrap">
   <header>
@@ -171,6 +240,34 @@ var grid = document.getElementById('grid');
 var empty = document.getElementById('empty');
 var find = document.getElementById('find');
 
+/* ===== écran de chargement ===== */
+var loader = document.getElementById('loader');
+var loaderText = document.getElementById('loaderText');
+var started = Date.now();
+var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var MIN_MS = reduce ? 300 : 1800; // durée minimale pour voir le dessin
+
+function showLoader(text) {
+  loaderText.textContent = text;
+  loader.hidden = false;
+  loader.classList.remove('done');
+  document.body.classList.add('loading');
+}
+function hideLoader() {
+  loader.classList.add('done');
+  document.body.classList.remove('loading');
+  setTimeout(function () { if (loader.classList.contains('done')) loader.hidden = true; }, 500);
+}
+function onProjectClick(e) {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  var a = e.currentTarget;
+  showLoader('Ouverture de ' + a.querySelector('.name').textContent);
+  setTimeout(function () { window.location.href = a.href; }, reduce ? 100 : 1100);
+}
+// retour arrière du navigateur : on ne laisse pas l'écran de chargement affiché
+window.addEventListener('pageshow', function (e) { if (e.persisted) hideLoader(); });
+
 function el(tag, cls, text) {
   var e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -190,6 +287,7 @@ function render() {
     var li = el('li');
     var a = el('a', 'card');
     a.href = './' + p.id + '/';
+    a.addEventListener('click', onProjectClick);
     a.style.setProperty('--c', p.color || '#4aa8ff');
     a.style.setProperty('--r', ROT[i % ROT.length] + 'deg');
 
@@ -218,7 +316,8 @@ function render() {
 }
 
 find.addEventListener('input', render);
-fetch('sites.json', { cache: 'no-cache' })
+
+var sitesReady = fetch('sites.json', { cache: 'no-cache' })
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(function (list) {
     PROJECTS = list;
@@ -230,6 +329,13 @@ fetch('sites.json', { cache: 'no-cache' })
     empty.textContent = 'Impossible de charger la liste des projets (sites.json).';
     empty.hidden = false;
   });
+var fontsReady = Promise.race([
+  document.fonts ? document.fonts.ready : Promise.resolve(),
+  new Promise(function (r) { setTimeout(r, 2500); })
+]);
+Promise.all([sitesReady, fontsReady]).then(function () {
+  setTimeout(hideLoader, Math.max(0, MIN_MS - (Date.now() - started)));
+});
 </script>
 </body>
 </html>
