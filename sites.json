@@ -8,4 +8,13 @@
     "icon": "ball8",
     "cta": "Jouer"
   }
+  {
+    "id": "me",
+    "title": "Me Webstite",
+    "desc": "Mon site de présentation",
+    "url": "https://xeroxytb.github.io/me/",
+    "color": "#3ddc97",
+    "icon": "CodeSigns",
+    "cta": "Visiter"
+  }
 ]
