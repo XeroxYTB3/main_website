@@ -30,6 +30,14 @@ jobs:
         run: node scripts/icons.mjs
       - name: Protéger les jeux (garde anti-copie)
         run: node scripts/protect.mjs
+      - name: Icônes du portail (PNG, ICO, manifeste)
+        continue-on-error: true   # si ça échoue, le logo SVG de index.html suffit
+        run: |
+          npm install --no-save --no-package-lock @resvg/resvg-js
+          node scripts/logo.mjs
+      - name: Héberger les polices
+        continue-on-error: true   # si ça échoue, Google Fonts reste utilisé
+        run: node scripts/fonts.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
