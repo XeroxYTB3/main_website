@@ -4,7 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fffdf5">
+<meta name="description" content="Mes projets : jeux et sites à ouvrir directement dans le navigateur.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mes projets">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Mes projets">
+<meta property="og:description" content="Jeux et sites à ouvrir directement dans le navigateur.">
+<meta property="og:image" content="https://xeroxytb.com/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mes projets">
+<meta name="twitter:description" content="Jeux et sites à ouvrir directement dans le navigateur.">
+<meta name="twitter:image" content="https://xeroxytb.com/icon-512.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='13' y='14' width='82' height='80' rx='22' fill='%233ddc97'/%3E%3Crect x='6' y='7' width='82' height='80' rx='22' fill='%23fffdf5' stroke='%231d1b2e' stroke-width='6'/%3E%3Crect x='20' y='54' width='54' height='16' rx='6' fill='%23ffd93d' transform='rotate(-3 47 62)'/%3E%3Cpath d='M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z' fill='%231d1b2e' fill-rule='evenodd' transform='translate(-3 0)'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Mes projets</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +33,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0; min-height:100vh; color:var(--ink); font-family:var(--hand); font-size:1.2rem;
+  margin:0; min-height:100vh; min-height:100dvh; color:var(--ink); font-family:var(--hand); font-size:1.2rem;
   padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   background-color:var(--paper);
   background-image:linear-gradient(var(--grid) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
@@ -70,8 +84,12 @@ h1{
   background:color-mix(in srgb,var(--c) 55%,transparent);
   border-left:3px dotted rgba(29,27,46,.25);border-right:3px dotted rgba(29,27,46,.25);
 }
-a.card:hover,a.card:focus-visible{transform:rotate(0deg) translateY(-6px);outline:none}
-a.card:hover::before,a.card:focus-visible::before{box-shadow:11px 13px 0 var(--c)}
+a.card:focus-visible{transform:rotate(0deg) translateY(-6px);outline:none}
+a.card:focus-visible::before{box-shadow:11px 13px 0 var(--c)}
+@media (hover:hover){ /* le survol n'existe qu'avec une souris : pas d'effet "collé" après un tap */
+  a.card:hover{transform:rotate(0deg) translateY(-6px)}
+  a.card:hover::before{box-shadow:11px 13px 0 var(--c)}
+}
 a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
 
 .icon{width:92px;height:92px;margin:0 0 4px -4px;display:flex;align-items:center;justify-content:center;font-size:3.2rem}
@@ -109,27 +127,37 @@ a.card:focus-visible::before{border-color:var(--pink);border-width:4px}
   a.card:hover,a.card:focus-visible{transform:rotate(var(--r))}
 }
 
-/* ===== lecteur : le projet s'ouvre dans un cadre (barre du haut, cadre, barre du bas) ===== */
+/* ===== lecteur : le projet s'ouvre dans un cadre (barre du haut + cadre plein) ===== */
 body.playing{overflow:hidden}
 #player{
   --c:#3ddc97;
   position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;gap:12px;
-  padding:calc(10px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));
+  padding:calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
   background-color:var(--paper);
   background-image:linear-gradient(var(--grid) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--grid) 1.5px,transparent 1.5px);
   background-size:32px 32px;
 }
 #player[hidden]{display:none}
-.ptop{display:flex;align-items:center;gap:16px}
+.ptop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .plogo{display:flex;align-items:center;gap:10px;flex:none;border:0;background:none;padding:0;color:var(--ink);font-family:var(--marker);font-size:1.4rem;cursor:pointer}
 .plogo svg{width:44px;height:44px}
-.psearch{position:relative;flex:1;max-width:520px;margin:0 auto}
+.pinfo{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0}
+.pico{flex:none;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.pico img{width:100%;height:100%;object-fit:contain;border-radius:10px}
+.pico svg{width:100%;height:100%}
+#pName{font-family:var(--marker);font-weight:400;font-size:1.4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psearch{position:relative;flex:0 1 360px;min-width:0}
 .psearch input{width:100%;padding:9px 20px;border:3px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:1.1rem}
 .psearch input:focus{outline:3px solid var(--pink);outline-offset:2px}
 #pList{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:5;margin:0;padding:6px;list-style:none;background:#fff;border:3px solid var(--ink);border-radius:20px}
 #pList[hidden]{display:none}
 #pList button{width:100%;text-align:left;padding:8px 14px;border:0;border-radius:14px;background:none;color:var(--ink);font:inherit;cursor:pointer}
-#pList button:hover,#pList button:focus-visible{background:var(--yellow);outline:none}
+#pList button:focus-visible{background:var(--yellow);outline:none}
+.pbtns{display:flex;gap:10px;flex:none}
+.pb{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);cursor:pointer;padding:0}
+.pb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pb:focus-visible{background:var(--yellow);outline:3px solid var(--pink);outline-offset:2px}
+#pSearchBtn{display:none}
 .stage{position:relative;flex:1;min-height:0;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
 .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
 .stage:fullscreen{border:0;border-radius:0;box-shadow:none;background:#000}
@@ -137,20 +165,29 @@ body.playing{overflow:hidden}
 .stage.pfs{position:fixed;inset:0;z-index:60;border:0;border-radius:0;box-shadow:none}
 .pexit{position:absolute;top:calc(8px + env(safe-area-inset-top));right:8px;z-index:2;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);font-size:1.2rem;cursor:pointer;opacity:.85;padding:0}
 .pexit[hidden]{display:none}
-.pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 6px}
-.pinfo{display:flex;align-items:center;gap:12px;min-width:0}
-.pico{flex:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
-.pico img{width:100%;height:100%;object-fit:contain;border-radius:10px}
-.pico svg{width:100%;height:100%}
-#pName{font-family:var(--marker);font-weight:400;font-size:1.4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pbtns{display:flex;gap:10px;flex:none}
-.pb{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);cursor:pointer;padding:0}
-.pb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.pb:hover,.pb:focus-visible{background:var(--yellow);outline:none}
-.pb.on{background:var(--pink);color:#fff}
-.pb.on svg{fill:currentColor}
-.pb.ok{background:var(--c)}
-@media (max-width:520px){.plogo span{display:none}.ptop{gap:10px}}
+@media (hover:hover){
+  .pb:hover{background:var(--yellow)}
+  #pList button:hover{background:var(--yellow)}
+}
+@media (max-width:760px){ /* la recherche passe derrière une loupe */
+  .plogo span{display:none}
+  #pSearchBtn{display:flex}
+  .psearch{display:none;order:9;flex:1 1 100%}
+  .psearch.open{display:block}
+}
+@media (max-width:520px){
+  #player{gap:10px;padding-left:12px;padding-right:12px}
+  .ptop{gap:10px}.pbtns{gap:7px}
+  .pb{width:40px;height:40px}.pb svg{width:19px;height:19px}
+  .plogo svg{width:38px;height:38px}
+  #pName{font-size:1.15rem}.pico{width:32px;height:32px}
+  .stage{border-radius:18px;box-shadow:5px 6px 0 var(--c)}
+}
+@media (max-height:480px){ /* téléphone en paysage : le jeu garde un maximum de place */
+  #player{gap:6px;padding-top:calc(6px + env(safe-area-inset-top));padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  .psearch input{padding:5px 16px}.plogo svg{width:34px;height:34px}.pb{width:38px;height:38px}.pico{width:30px;height:30px}
+}
+a.card,.go,.pb,.plogo,#pList button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 /* ===== écran de chargement (style doodle : barre rayée) ===== */
 body.loading{overflow:hidden}
@@ -179,9 +216,11 @@ body.loading{overflow:hidden}
   .llogo{animation:none}
   .dots i{animation:none}
 }
+@media (max-width:520px){.ltext{font-size:1.6rem}.llogo{width:104px;height:104px}}
+@media (max-height:480px){.lwrap{gap:8px}.llogo{width:70px;height:70px}.ltext{font-size:1.4rem;margin:0}}
 </style>
 </head>
-<body class="loading">
+<body>
 
 <!-- filtre : traits légèrement tremblés, comme dessinés à la main -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -195,7 +234,7 @@ body.loading{overflow:hidden}
   </filter>
 </svg>
 
-<div id="loader" role="status" aria-live="polite">
+<div id="loader" role="status" aria-live="polite" hidden>
   <div class="lwrap">
     <svg class="llogo" viewBox="0 0 100 100" aria-hidden="true"><defs><pattern id="pst" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="skewX(-22)"><rect width="12" height="12" fill="#ff5c8a"/><rect width="2.4" height="12" fill="#fffdf5"/></pattern></defs><rect x="15" y="20" width="78" height="76" rx="20" fill="#3ddc97"/><rect x="8" y="13" width="78" height="76" rx="20" fill="#fffdf5" stroke="#1d1b2e" stroke-width="3.5"/><rect x="15" y="20" width="64" height="62" rx="13" fill="none" stroke="#1d1b2e" stroke-width="1.6"/><rect x="22" y="56" width="52" height="15" rx="6" fill="#ffd93d" transform="rotate(-3 48 63)"/><path d="M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z" fill="url(#pst)" fill-rule="evenodd" stroke="#1d1b2e" stroke-width="2.4" stroke-linejoin="round" transform="translate(1.5 7) scale(.9)"/><rect x="28" y="4" width="38" height="14" rx="5" fill="#3ddc97" fill-opacity=".6" stroke="#1d1b2e" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="1.5 3.5" transform="rotate(-4 47 11)"/></svg>
     <p class="ltext"><span>Chargement</span><span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
@@ -245,29 +284,26 @@ body.loading{overflow:hidden}
   </main>
 </div>
 
-<div id="player" hidden>
+<div id="player" role="dialog" aria-modal="true" aria-labelledby="pName" hidden>
   <div class="ptop">
     <button class="plogo" id="pHome" type="button" aria-label="Retour aux projets">
       <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="10" y="10" width="80" height="80" rx="22" fill="#3ddc97" stroke="#1d1b2e" stroke-width="6"/><path d="M30 20H52a19 19 0 0 1 0 38H44V80H30Z M44 32H51a7 7 0 0 1 0 14H44Z" fill="#1d1b2e" fill-rule="evenodd"/></svg>
       <span>Mes projets</span>
     </button>
-    <div class="psearch">
-      <input id="pFind" type="search" placeholder="Rechercher un projet" aria-label="Rechercher un projet" autocomplete="off">
-      <ul id="pList" hidden></ul>
+    <div class="pinfo"><span class="pico" id="pIco" aria-hidden="true"></span><strong id="pName"></strong></div>
+    <div class="psearch" id="pSearch">
+      <input id="pFind" type="search" placeholder="Rechercher un projet" aria-label="Rechercher un projet" aria-controls="pList" autocomplete="off">
+      <ul id="pList" aria-label="Résultats de la recherche" hidden></ul>
+    </div>
+    <div class="pbtns">
+      <button class="pb" id="pSearchBtn" type="button" aria-label="Rechercher un projet" aria-expanded="false" aria-controls="pSearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg></button>
+      <button class="pb" id="pFs" type="button" aria-label="Plein écran"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="pb" id="pClose" type="button" aria-label="Fermer (Échap)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
   </div>
   <div class="stage" id="stage">
     <iframe id="pFrame" title="Projet" allow="fullscreen; autoplay; clipboard-write; gamepad" allowfullscreen></iframe>
     <button class="pexit" id="pExit" type="button" aria-label="Quitter le plein écran" hidden>✕</button>
-  </div>
-  <div class="pbar">
-    <div class="pinfo"><span class="pico" id="pIco"></span><strong id="pName"></strong></div>
-    <div class="pbtns">
-      <button class="pb" id="pShare" type="button" aria-label="Copier le lien"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
-      <button class="pb" id="pLike" type="button" aria-label="J'aime"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.4 5.4 0 0 1 12 6.6 5.4 5.4 0 0 1 21.3 12C19 16.4 12 21 12 21z"/></svg></button>
-      <button class="pb" id="pFs" type="button" aria-label="Plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="pb" id="pClose" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    </div>
   </div>
 </div>
 
@@ -449,19 +485,15 @@ var pName = document.getElementById('pName');
 var pIco = document.getElementById('pIco');
 var pFind = document.getElementById('pFind');
 var pList = document.getElementById('pList');
-var pLike = document.getElementById('pLike');
-var pShare = document.getElementById('pShare');
+var pSearch = document.getElementById('pSearch');
+var pSearchBtn = document.getElementById('pSearchBtn');
+var wrap = document.querySelector('.wrap');
 var pFs = document.getElementById('pFs');
 var current = null;
 
 function byId(id) {
   for (var i = 0; i < PROJECTS.length; i++) if (PROJECTS[i].id === id) return PROJECTS[i];
   return null;
-}
-function syncLike() {
-  var on = false;
-  try { on = localStorage.getItem('like:' + current.id) === '1'; } catch (e) {}
-  pLike.classList.toggle('on', on);
 }
 function openProject(id) {
   var p = byId(id);
@@ -472,15 +504,20 @@ function openProject(id) {
   fillIcon(pIco, p, 'fav');
   frame.title = p.title || p.id;
   frame.src = './' + p.id + '/';
-  syncLike();
   pFind.value = '';
   pList.hidden = true;
+  pSearch.classList.remove('open');
+  pSearchBtn.setAttribute('aria-expanded', 'false');
   player.hidden = false;
+  wrap.inert = true; // le portail derrière n'est plus atteignable au clavier
   document.body.classList.add('playing');
+  try { frame.focus(); } catch (e) {} // le jeu reçoit tout de suite les touches
   document.title = (p.title || p.id) + ' – Mes projets';
   return true;
 }
 function closePlayer() {
+  var wasOpen = !player.hidden, backId = current && current.id;
+  wrap.inert = false;
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   stage.classList.remove('pfs');
   pExit.hidden = true;
@@ -489,6 +526,10 @@ function closePlayer() {
   document.body.classList.remove('playing');
   document.title = 'Mes projets';
   current = null;
+  if (wasOpen && backId) { // le focus revient sur la carte du projet qu'on vient de quitter
+    var card = grid.querySelector('a.card[data-id="' + backId + '"]');
+    if (card) card.focus({ preventScroll: true });
+  }
 }
 function fromHash() {
   var id = decodeURIComponent(location.hash.slice(1));
@@ -516,18 +557,22 @@ pFind.addEventListener('input', function () {
   });
   pList.hidden = hits.length === 0;
 });
-
-pLike.addEventListener('click', function () {
-  var on = !pLike.classList.contains('on');
-  try { localStorage.setItem('like:' + current.id, on ? '1' : '0'); } catch (e) {}
-  pLike.classList.toggle('on', on);
+// clavier : Entrée ouvre le premier résultat, flèches pour se déplacer dans la liste
+pFind.addEventListener('keydown', function (e) {
+  var first = pList.querySelector('button');
+  if (e.key === 'Enter' && first) { e.preventDefault(); first.click(); }
+  else if (e.key === 'ArrowDown' && first) { e.preventDefault(); first.focus(); }
 });
-pShare.addEventListener('click', function () {
-  if (!navigator.clipboard || !navigator.clipboard.writeText) return;
-  navigator.clipboard.writeText(location.href).then(function () {
-    pShare.classList.add('ok');
-    setTimeout(function () { pShare.classList.remove('ok'); }, 1200);
-  }, function () {});
+pList.addEventListener('keydown', function (e) {
+  var b = Array.prototype.slice.call(pList.querySelectorAll('button')), i = b.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown') { e.preventDefault(); (b[i + 1] || b[0]).focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) pFind.focus(); else b[i - 1].focus(); }
+});
+pSearchBtn.addEventListener('click', function () {
+  var on = !pSearch.classList.contains('open');
+  pSearch.classList.toggle('open', on);
+  pSearchBtn.setAttribute('aria-expanded', String(on));
+  if (on) pFind.focus();
 });
 /* plein écran : vrai plein écran si le navigateur le permet, sinon le cadre remplit la fenêtre */
 var pExit = document.getElementById('pExit');
@@ -558,7 +603,12 @@ function exitFs() {
 pFs.addEventListener('click', function () { if (fsActive()) exitFs(); else enterFs(); });
 pExit.addEventListener('click', exitFs);
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (n) { document.addEventListener(n, fsPoke); });
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && stage.classList.contains('pfs')) exitFs(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if (stage.classList.contains('pfs')) { exitFs(); return; }
+  if (!player.hidden && !pList.hidden) { pList.hidden = true; pFind.focus(); return; }
+  if (!player.hidden) location.hash = ''; // Échap ferme le projet (si le focus est sur le portail, pas dans le jeu)
+});
 
 /* dissuasion : pas de clic droit, ni F12 / Ctrl+S / Ctrl+U / Ctrl+Maj+I (contournable, voir scripts/protect.mjs) */
 addEventListener('contextmenu', function (e) { e.preventDefault(); }, true);
@@ -580,11 +630,6 @@ var sitesReady = fetch('sites.json', { cache: 'no-cache' })
     empty.textContent = 'Impossible de charger la liste des projets (sites.json).';
     empty.hidden = false;
   });
-var fontsReady = Promise.race([
-  document.fonts ? document.fonts.ready : Promise.resolve(),
-  new Promise(function (r) { setTimeout(r, 2500); })
-]);
-runLoader(Promise.all([sitesReady, fontsReady]), hideLoader);
 </script>
 </body>
 </html>
