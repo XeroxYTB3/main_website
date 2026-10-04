@@ -158,11 +158,14 @@ body.playing{overflow:hidden}
 .pb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .pb:focus-visible{background:var(--yellow);outline:3px solid var(--pink);outline-offset:2px}
 #pSearchBtn{display:none}
-.stage{position:relative;flex:1;min-height:0;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
-.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+.stagebox{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+/* le cadre garde les proportions de la fenêtre (taille posée par fitStage) : le jeu s'y affiche en réduit, sans barre de défilement */
+.stage{position:relative;flex:none;width:100%;height:100%;border:3px solid var(--ink);border-radius:22px;background:#fff;overflow:hidden;box-shadow:7px 8px 0 var(--c)}
+.stage iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0;display:block;background:#fff;transform-origin:0 0}
 .stage:fullscreen{border:0;border-radius:0;box-shadow:none;background:#000}
 .stage:-webkit-full-screen{border:0;border-radius:0;box-shadow:none;background:#000}
-.stage.pfs{position:fixed;inset:0;z-index:60;border:0;border-radius:0;box-shadow:none}
+.stage.pfs{position:fixed;inset:0;z-index:60;width:auto!important;height:auto!important;border:0;border-radius:0;box-shadow:none}
+.stage:fullscreen iframe,.stage:-webkit-full-screen iframe,.stage.pfs iframe{width:100%!important;height:100%!important;transform:none!important}
 .pexit{position:absolute;top:calc(8px + env(safe-area-inset-top));right:8px;z-index:2;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink);border-radius:50%;background:#fff;color:var(--ink);font-size:1.2rem;cursor:pointer;opacity:.85;padding:0}
 .pexit[hidden]{display:none}
 @media (hover:hover){
@@ -301,9 +304,11 @@ body.loading{overflow:hidden}
       <button class="pb" id="pClose" type="button" aria-label="Fermer (Échap)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
   </div>
+  <div class="stagebox" id="stagebox">
   <div class="stage" id="stage">
     <iframe id="pFrame" title="Projet" allow="fullscreen; autoplay; clipboard-write; gamepad" allowfullscreen></iframe>
     <button class="pexit" id="pExit" type="button" aria-label="Quitter le plein écran" hidden>✕</button>
+  </div>
   </div>
 </div>
 
@@ -488,6 +493,7 @@ var pList = document.getElementById('pList');
 var pSearch = document.getElementById('pSearch');
 var pSearchBtn = document.getElementById('pSearchBtn');
 var wrap = document.querySelector('.wrap');
+var stagebox = document.getElementById('stagebox');
 var pFs = document.getElementById('pFs');
 var current = null;
 
@@ -495,6 +501,23 @@ function byId(id) {
   for (var i = 0; i < PROJECTS.length; i++) if (PROJECTS[i].id === id) return PROJECTS[i];
   return null;
 }
+/* le jeu s'affiche à la taille de la vraie fenêtre, réduit pour tenir dans le cadre : pas de barre de défilement */
+function fitStage() {
+  if (player.hidden || stage.classList.contains('pfs') || document.fullscreenElement || document.webkitFullscreenElement) return;
+  var VW = Math.max(320, window.innerWidth), VH = Math.max(320, window.innerHeight);
+  var iw = stagebox.clientWidth - 8 - 6, ih = stagebox.clientHeight - 8 - 6; // place de l'ombre et de la bordure
+  if (iw < 50 || ih < 50) return;
+  var k = Math.min(iw / VW, ih / VH, 1);
+  stage.style.width = Math.ceil(VW * k) + 6 + 'px';
+  stage.style.height = Math.ceil(VH * k) + 6 + 'px';
+  frame.style.width = VW + 'px';
+  frame.style.height = VH + 'px';
+  frame.style.transform = 'scale(' + k + ')';
+}
+window.addEventListener('resize', fitStage);
+window.addEventListener('orientationchange', fitStage);
+if (window.ResizeObserver) new ResizeObserver(fitStage).observe(stagebox);
+
 function openProject(id) {
   var p = byId(id);
   if (!p) return false;
@@ -511,6 +534,7 @@ function openProject(id) {
   player.hidden = false;
   wrap.inert = true; // le portail derrière n'est plus atteignable au clavier
   document.body.classList.add('playing');
+  fitStage();
   try { frame.focus(); } catch (e) {} // le jeu reçoit tout de suite les touches
   document.title = (p.title || p.id) + ' – Mes projets';
   return true;
@@ -596,15 +620,16 @@ function enterFs() {
   } catch (e) { fallback(); }
 }
 function exitFs() {
-  if (stage.classList.contains('pfs')) { stage.classList.remove('pfs'); pExit.hidden = true; fsPoke(); return; }
+  if (stage.classList.contains('pfs')) { stage.classList.remove('pfs'); pExit.hidden = true; fitStage(); fsPoke(); return; }
   var ex = document.exitFullscreen || document.webkitExitFullscreen;
   if (ex) ex.call(document);
 }
 pFs.addEventListener('click', function () { if (fsActive()) exitFs(); else enterFs(); });
 pExit.addEventListener('click', exitFs);
-['fullscreenchange', 'webkitfullscreenchange'].forEach(function (n) { document.addEventListener(n, fsPoke); });
+['fullscreenchange', 'webkitfullscreenchange'].forEach(function (n) { document.addEventListener(n, function () { fsPoke(); fitStage(); }); });
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
+  if (document.fullscreenElement || document.webkitFullscreenElement) return; // le navigateur quitte le plein écran tout seul
   if (stage.classList.contains('pfs')) { exitFs(); return; }
   if (!player.hidden && !pList.hidden) { pList.hidden = true; pFind.focus(); return; }
   if (!player.hidden) location.hash = ''; // Échap ferme le projet (si le focus est sur le portail, pas dans le jeu)
