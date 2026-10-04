@@ -118,11 +118,22 @@ for (const f of ['index.html', 'sites.json', '404.html']) {
   if (await exists(src)) await copyFile(src, path.join(OUT, f));
 }
 
-let failed = false;
+const failedIds = new Set();
 for (const site of sites) {
   console.log(`> ${site.id}  (${site.url})`);
   try { await mirror(site); }
-  catch (e) { failed = true; console.error(`  X ${e.message}`); }
+  catch (e) {
+    failedIds.add(site.id);
+    console.error(`  X ${e.message}`);
+    console.log(`::warning title=Site ignoré : ${site.id}::${e.message}`);
+    await rm(path.join(OUT, site.id), { recursive: true, force: true }); // pas de dossier à moitié copié
+  }
 }
-if (failed) { console.error('\nAu moins un site a échoué : rien ne sera déployé.'); process.exit(1); }
+if (failedIds.size) {
+  // les sites en erreur disparaissent de la liste du portail, les autres sont déployés normalement
+  const ok = sites.filter((s) => !failedIds.has(s.id));
+  await writeFile(path.join(OUT, 'sites.json'), JSON.stringify(ok, null, 2));
+  console.error(`\n${failedIds.size} site(s) ignoré(s) : ${[...failedIds].join(', ')}`);
+  if (!ok.length) { console.error('Aucun site n\'a pu être récupéré : rien ne sera déployé.'); process.exit(1); }
+}
 console.log('\nTerminé.');
