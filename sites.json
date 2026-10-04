@@ -18,6 +18,15 @@
     "cta": "Jouer"
   },
   {
+    "id": "tire-corde",
+    "title": "Tire Corde",
+    "desc": "Deux équipes, une corde : chaque bonne réponse tire la corde de ton côté !",
+    "url": "https://xeroxytb.github.io/Tire-Corde/",
+    "color": "#4d7cff",
+    "icon": "star",
+    "cta": "Jouer"
+  },
+  {
     "id": "calendar",
     "title": "Calendrier de l'Avent",
     "desc": "Ouvre une case par jour et découvre la surprise.",
