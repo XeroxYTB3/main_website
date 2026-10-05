@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: 20
       - name: Récupérer les sites listés dans sites.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}   # évite la limite de l'API GitHub pour lister les dossiers d'assets
         run: node scripts/sync.mjs
       - name: Récupérer les favicons
         run: node scripts/icons.mjs
