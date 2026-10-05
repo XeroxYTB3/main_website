@@ -192,6 +192,30 @@ body.playing{overflow:hidden}
 }
 a.card,.go,.pb,.plogo,#pList button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
+/* ===== réglages (engrenage en bas à droite du portail) + banderole du lecteur masquable ===== */
+.gear{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:20}
+#settings{
+  position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:21;
+  width:min(330px,calc(100vw - 28px));padding:16px 18px 18px;background:#fff;color:var(--ink);
+  border:3px solid var(--ink);border-radius:22px;box-shadow:6px 7px 0 var(--yellow);
+}
+#settings[hidden]{display:none}
+#settings h2{margin:0 0 12px;font-family:var(--marker);font-weight:400;font-size:1.6rem;line-height:1.1}
+.opt{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:1.2rem;line-height:1.25}
+.opt input{flex:none;width:26px;height:26px;margin:1px 0 0;accent-color:var(--pink);cursor:pointer}
+.opt small{display:block;margin-top:4px;color:var(--soft);font-size:1rem;line-height:1.25}
+/* sans banderole : le jeu prend toute la place ; petite croix discrète (et Échap) pour revenir aux projets */
+#player.nobar .ptop{display:none}
+.pquick{
+  display:none;position:absolute;top:calc(6px + env(safe-area-inset-top));right:6px;z-index:3;width:34px;height:34px;
+  align-items:center;justify-content:center;padding:0;border:2px solid var(--ink);border-radius:50%;
+  background:#fff;color:var(--ink);font:inherit;font-size:1rem;line-height:1;cursor:pointer;opacity:.55;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.pquick:hover,.pquick:focus-visible{opacity:1;background:var(--yellow);outline:none}
+#player.nobar .pquick{display:flex}
+#player.nobar .pquick[hidden]{display:none}
+
 /* ===== écran de chargement (style doodle : barre rayée) ===== */
 body.loading{overflow:hidden}
 #loader{
@@ -262,6 +286,16 @@ body.loading{overflow:hidden}
 <noscript><style>#loader{display:none}</style></noscript>
 
 <div class="wrap">
+  <button class="pb gear" id="gear" type="button" aria-label="Réglages" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  <div id="settings" role="dialog" aria-labelledby="settingsTitle" hidden>
+    <h2 id="settingsTitle">Réglages</h2>
+    <label class="opt">
+      <input type="checkbox" id="optBanner" checked>
+      <span>Banderole en haut des projets
+        <small>Logo, nom du projet et boutons au-dessus du jeu. Décoche pour donner toute la place au jeu (Échap ou la petite croix pour revenir).</small>
+      </span>
+    </label>
+  </div>
   <header>
     <h1><span class="hl">Mes projets</span></h1>
     <svg class="under" viewBox="0 0 420 26" preserveAspectRatio="none" aria-hidden="true">
@@ -310,6 +344,7 @@ body.loading{overflow:hidden}
     <button class="pexit" id="pExit" type="button" aria-label="Quitter le plein écran" hidden>✕</button>
   </div>
   </div>
+  <button class="pquick" id="pQuick" type="button" aria-label="Fermer le projet (Échap)">✕</button>
 </div>
 
 <script>
@@ -531,6 +566,7 @@ function openProject(id) {
   pList.hidden = true;
   pSearch.classList.remove('open');
   pSearchBtn.setAttribute('aria-expanded', 'false');
+  closeSettings();
   player.hidden = false;
   wrap.inert = true; // le portail derrière n'est plus atteignable au clavier
   document.body.classList.add('playing');
@@ -629,6 +665,7 @@ pExit.addEventListener('click', exitFs);
 ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (n) { document.addEventListener(n, function () { fsPoke(); fitStage(); }); });
 document.addEventListener('keydown', function (e) {
   if (e.key !== 'Escape') return;
+  if (!settingsBox.hidden) { closeSettings(); gear.focus(); return; }
   if (document.fullscreenElement || document.webkitFullscreenElement) return; // le navigateur quitte le plein écran tout seul
   if (stage.classList.contains('pfs')) { exitFs(); return; }
   if (!player.hidden && !pList.hidden) { pList.hidden = true; pFind.focus(); return; }
@@ -641,6 +678,38 @@ addEventListener('keydown', function (e) {
   var k = (e.key || '').toLowerCase(), c = e.ctrlKey || e.metaKey;
   if (k === 'f12' || (c && k.length === 1 && 'sup'.indexOf(k) > -1) || (c && e.shiftKey && k.length === 1 && 'ijc'.indexOf(k) > -1)) e.preventDefault();
 }, true);
+
+/* ===== réglages (gardés dans ce navigateur, par appareil) ===== */
+var SETTINGS_KEY = 'mp.settings';
+var settings = { banner: true }; // banner : false = pas de banderole en haut des projets
+try {
+  var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  if (saved && saved.banner === false) settings.banner = false;
+} catch (e) {}
+var gear = document.getElementById('gear');
+var settingsBox = document.getElementById('settings');
+var optBanner = document.getElementById('optBanner');
+function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
+function applySettings() {
+  player.classList.toggle('nobar', !settings.banner);
+  optBanner.checked = settings.banner;
+  fitStage(); // le cadre du jeu reprend la place libérée (ou la rend)
+}
+function openSettings() {
+  settingsBox.hidden = false;
+  gear.setAttribute('aria-expanded', 'true');
+}
+function closeSettings() {
+  settingsBox.hidden = true;
+  gear.setAttribute('aria-expanded', 'false');
+}
+gear.addEventListener('click', function () { if (settingsBox.hidden) openSettings(); else closeSettings(); });
+optBanner.addEventListener('change', function () { settings.banner = optBanner.checked; saveSettings(); applySettings(); });
+document.addEventListener('click', function (e) {
+  if (!settingsBox.hidden && !settingsBox.contains(e.target) && !gear.contains(e.target)) closeSettings();
+});
+document.getElementById('pQuick').addEventListener('click', function () { location.hash = ''; });
+applySettings();
 
 var sitesReady = fetch('sites.json', { cache: 'no-cache' })
   .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })

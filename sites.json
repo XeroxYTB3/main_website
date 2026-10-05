@@ -49,6 +49,7 @@
     "title": "Impression 3D",
     "desc": "Objets utiles, déco et pièces sur mesure imprimés en 3D.",
     "url": "https://xeroxytb3.github.io/My3DWebsite/",
+    "include": ["assets"],
     "color": "#3ddc97",
     "icon": "star",
     "cta": "Découvrir"
