@@ -203,7 +203,7 @@ a.card,.go,.pb,.plogo,#pList button{-webkit-tap-highlight-color:transparent;touc
 #settings h2{margin:0 0 12px;font-family:var(--marker);font-weight:400;font-size:1.6rem;line-height:1.1}
 .opt{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:1.2rem;line-height:1.25}
 .opt input{flex:none;width:26px;height:26px;margin:1px 0 0;accent-color:var(--pink);cursor:pointer}
-.opt + .opt{margin-top:14px}
+.note{margin:14px 0 0;color:var(--soft);font-size:1rem;line-height:1.25}
 .opt small{display:block;margin-top:4px;color:var(--soft);font-size:1rem;line-height:1.25}
 /* sans banderole : le jeu prend toute la place ; petite croix discrète (et Échap) pour revenir aux projets */
 #player.nobar .ptop{display:none}
@@ -296,12 +296,7 @@ body.loading{overflow:hidden}
         <small>Logo, nom du projet et boutons au-dessus du jeu. Décoche pour donner toute la place au jeu (Échap ou la petite croix pour revenir).</small>
       </span>
     </label>
-    <label class="opt">
-      <input type="checkbox" id="optBarSite" checked>
-      <span>Banderole sur les sites
-        <small>La même barre, pour les projets de type « site ».</small>
-      </span>
-    </label>
+    <p class="note">Les sites s'ouvrent directement, tels quels, sans cadre ni banderole.</p>
   </div>
   <header>
     <h1><span class="hl">Mes projets</span></h1>
@@ -357,8 +352,8 @@ body.loading{overflow:hidden}
 <script>
 /* Les projets viennent du fichier sites.json (même dossier que ce fichier).
    Chaque projet : id (nom du dossier), title, desc, url (site déployé),
-   color, cta (texte du bouton), type ("jeu" ou "site" : choisit le réglage de banderole
-   qui s'applique), bar (facultatif : true/false impose la banderole à ce projet seul).
+   color, cta (texte du bouton), type ("jeu" = dans le lecteur du portail ; "site" = ouvert
+   tel quel sur ton domaine, sans cadre), bar (facultatif, jeux seulement : true/false impose la banderole à ce jeu).
    Icône : "favicon" (ajouté automatiquement au déploiement par scripts/icons.mjs),
    sinon repli sur icon ("ball8" ou "star") ou emoji.                       */
 var PROJECTS = [];
@@ -445,13 +440,22 @@ function onProjectClick(e) {
   e.preventDefault();
   if (opening) return;
   opening = true;
-  var href = e.currentTarget.href, id = e.currentTarget.dataset.id;
+  var href = e.currentTarget.href, id = e.currentTarget.dataset.id, proj = byId(id);
   // pendant que la barre se trace, on précharge la page du jeu (4 s max)
   var warm = Promise.race([
     fetch(href).then(function (r) { return r.text(); }),
     new Promise(function (r) { setTimeout(r, 4000); })
   ]);
-  runLoader(warm, function () { opening = false; location.hash = id; hideLoader(); });
+  runLoader(warm, function () {
+    opening = false;
+    if (isSite(proj)) { // site : page brute sur ton domaine, pas de lecteur
+      goRaw(proj);
+      setTimeout(hideLoader, 4000); // si la navigation n'a pas eu lieu (hors ligne...), on libère l'écran
+      return;
+    }
+    location.hash = id;
+    hideLoader();
+  });
 }
 // retour arrière du navigateur : on ne laisse pas l'écran de chargement affiché
 window.addEventListener('pageshow', function (e) { if (e.persisted) { opening = false; cancelAnimationFrame(raf); hideLoader(); } });
@@ -564,6 +568,7 @@ if (window.ResizeObserver) new ResizeObserver(fitStage).observe(stagebox);
 function openProject(id) {
   var p = byId(id);
   if (!p) return false;
+  if (isSite(p)) { goRaw(p, true); return true; } // un site ne passe jamais par le lecteur
   current = p;
   player.classList.toggle('nobar', !barFor(p));
   player.style.setProperty('--c', p.color || '#3ddc97');
@@ -690,28 +695,31 @@ addEventListener('keydown', function (e) {
 
 /* ===== réglages (gardés dans ce navigateur, par appareil) ===== */
 var SETTINGS_KEY = 'mp.settings';
-var settings = { barGame: true, barSite: true }; // banderole en haut des projets, selon leur type (jeu / site)
+var settings = { barGame: true }; // banderole en haut des jeux (les sites n'en ont jamais : ils s'ouvrent bruts)
 try {
   var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-  if (saved && saved.banner === false) settings.barGame = settings.barSite = false; // ancien réglage unique
-  if (saved && saved.barGame === false) settings.barGame = false;
-  if (saved && saved.barSite === false) settings.barSite = false;
+  if (saved && (saved.banner === false || saved.barGame === false)) settings.barGame = false; // « banner » = ancien réglage
 } catch (e) {}
 var gear = document.getElementById('gear');
 var settingsBox = document.getElementById('settings');
 var optBarGame = document.getElementById('optBarGame');
-var optBarSite = document.getElementById('optBarSite');
 function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
-/* banderole d'un projet : "bar": true/false dans sites.json décide seul ;
-   sinon c'est le réglage de son type ("type": "jeu" ou "site" ; sans type = site) */
+/* type d'un projet (champ "type" de sites.json) :
+   "site" = s'ouvre tel quel sur ton domaine, sans cadre ; tout autre type (ou pas de type) = jeu, dans le lecteur du portail */
+function isSite(p) { return !!p && String(p.type || '').toLowerCase() === 'site'; }
+/* banderole d'un jeu : "bar": true/false dans sites.json décide seul ; sinon c'est le réglage « Banderole sur les jeux » */
 function barFor(p) {
   if (!p) return true;
   if (typeof p.bar === 'boolean') return p.bar;
-  return (p.type === 'jeu' || p.type === 'game') ? settings.barGame : settings.barSite;
+  return settings.barGame;
+}
+/* ouvre un site directement (page brute, même domaine) ; replace = sans ajouter d'entrée dans l'historique */
+function goRaw(p, replace) {
+  var url = './' + p.id + '/';
+  if (replace) location.replace(url); else location.assign(url);
 }
 function applySettings() {
   optBarGame.checked = settings.barGame;
-  optBarSite.checked = settings.barSite;
   player.classList.toggle('nobar', !barFor(current));
   fitStage(); // le cadre du jeu reprend la place libérée (ou la rend)
 }
@@ -725,7 +733,6 @@ function closeSettings() {
 }
 gear.addEventListener('click', function () { if (settingsBox.hidden) openSettings(); else closeSettings(); });
 optBarGame.addEventListener('change', function () { settings.barGame = optBarGame.checked; saveSettings(); applySettings(); });
-optBarSite.addEventListener('change', function () { settings.barSite = optBarSite.checked; saveSettings(); applySettings(); });
 document.addEventListener('click', function (e) {
   if (!settingsBox.hidden && !settingsBox.contains(e.target) && !gear.contains(e.target)) closeSettings();
 });
