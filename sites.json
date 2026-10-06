@@ -1,6 +1,7 @@
 [
   {
     "id": "8-ball-pool",
+    "type": "jeu",
     "title": "8 Ball Pool",
     "desc": "Billard 8-ball dans le navigateur : contre un bot, en ligne avec tes amis et en tournoi.",
     "url": "https://xeroxytb3.github.io/8-ball-pool/",
@@ -10,6 +11,7 @@
   },
   {
     "id": "duels",
+    "type": "jeu",
     "title": "Duel de calcul",
     "desc": "Seul ou jusqu'à 3 joueurs : le plus rapide gagne le point !",
     "url": "https://xeroxytb.github.io/duels/",
@@ -19,6 +21,7 @@
   },
   {
     "id": "tire-corde",
+    "type": "jeu",
     "title": "Tire Corde",
     "desc": "Deux équipes, une corde : chaque bonne réponse tire la corde de ton côté !",
     "url": "https://xeroxytb.github.io/Tire-Corde/",
@@ -28,6 +31,7 @@
   },
   {
     "id": "calendar",
+    "type": "site",
     "title": "Calendrier de l'Avent",
     "desc": "Ouvre une case par jour et découvre la surprise.",
     "url": "https://xeroxytb2.github.io/Calender/",
@@ -37,6 +41,7 @@
   },
   {
     "id": "me",
+    "type": "site",
     "title": "Mon site",
     "desc": "Mon site de présentation",
     "url": "https://xeroxytb.github.io/me/",
@@ -46,6 +51,7 @@
   },
   {
     "id": "my3dwebsite",
+    "type": "site",
     "title": "Impression 3D",
     "desc": "Objets utiles, déco et pièces sur mesure imprimés en 3D.",
     "url": "https://xeroxytb3.github.io/My3DWebsite/",

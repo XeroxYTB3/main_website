@@ -203,6 +203,7 @@ a.card,.go,.pb,.plogo,#pList button{-webkit-tap-highlight-color:transparent;touc
 #settings h2{margin:0 0 12px;font-family:var(--marker);font-weight:400;font-size:1.6rem;line-height:1.1}
 .opt{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:1.2rem;line-height:1.25}
 .opt input{flex:none;width:26px;height:26px;margin:1px 0 0;accent-color:var(--pink);cursor:pointer}
+.opt + .opt{margin-top:14px}
 .opt small{display:block;margin-top:4px;color:var(--soft);font-size:1rem;line-height:1.25}
 /* sans banderole : le jeu prend toute la place ; petite croix discrète (et Échap) pour revenir aux projets */
 #player.nobar .ptop{display:none}
@@ -290,9 +291,15 @@ body.loading{overflow:hidden}
   <div id="settings" role="dialog" aria-labelledby="settingsTitle" hidden>
     <h2 id="settingsTitle">Réglages</h2>
     <label class="opt">
-      <input type="checkbox" id="optBanner" checked>
-      <span>Banderole en haut des projets
+      <input type="checkbox" id="optBarGame" checked>
+      <span>Banderole sur les jeux
         <small>Logo, nom du projet et boutons au-dessus du jeu. Décoche pour donner toute la place au jeu (Échap ou la petite croix pour revenir).</small>
+      </span>
+    </label>
+    <label class="opt">
+      <input type="checkbox" id="optBarSite" checked>
+      <span>Banderole sur les sites
+        <small>La même barre, pour les projets de type « site ».</small>
       </span>
     </label>
   </div>
@@ -350,7 +357,8 @@ body.loading{overflow:hidden}
 <script>
 /* Les projets viennent du fichier sites.json (même dossier que ce fichier).
    Chaque projet : id (nom du dossier), title, desc, url (site déployé),
-   color, cta (texte du bouton).
+   color, cta (texte du bouton), type ("jeu" ou "site" : choisit le réglage de banderole
+   qui s'applique), bar (facultatif : true/false impose la banderole à ce projet seul).
    Icône : "favicon" (ajouté automatiquement au déploiement par scripts/icons.mjs),
    sinon repli sur icon ("ball8" ou "star") ou emoji.                       */
 var PROJECTS = [];
@@ -557,6 +565,7 @@ function openProject(id) {
   var p = byId(id);
   if (!p) return false;
   current = p;
+  player.classList.toggle('nobar', !barFor(p));
   player.style.setProperty('--c', p.color || '#3ddc97');
   pName.textContent = p.title || p.id;
   fillIcon(pIco, p, 'fav');
@@ -681,18 +690,29 @@ addEventListener('keydown', function (e) {
 
 /* ===== réglages (gardés dans ce navigateur, par appareil) ===== */
 var SETTINGS_KEY = 'mp.settings';
-var settings = { banner: true }; // banner : false = pas de banderole en haut des projets
+var settings = { barGame: true, barSite: true }; // banderole en haut des projets, selon leur type (jeu / site)
 try {
   var saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-  if (saved && saved.banner === false) settings.banner = false;
+  if (saved && saved.banner === false) settings.barGame = settings.barSite = false; // ancien réglage unique
+  if (saved && saved.barGame === false) settings.barGame = false;
+  if (saved && saved.barSite === false) settings.barSite = false;
 } catch (e) {}
 var gear = document.getElementById('gear');
 var settingsBox = document.getElementById('settings');
-var optBanner = document.getElementById('optBanner');
+var optBarGame = document.getElementById('optBarGame');
+var optBarSite = document.getElementById('optBarSite');
 function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
+/* banderole d'un projet : "bar": true/false dans sites.json décide seul ;
+   sinon c'est le réglage de son type ("type": "jeu" ou "site" ; sans type = site) */
+function barFor(p) {
+  if (!p) return true;
+  if (typeof p.bar === 'boolean') return p.bar;
+  return (p.type === 'jeu' || p.type === 'game') ? settings.barGame : settings.barSite;
+}
 function applySettings() {
-  player.classList.toggle('nobar', !settings.banner);
-  optBanner.checked = settings.banner;
+  optBarGame.checked = settings.barGame;
+  optBarSite.checked = settings.barSite;
+  player.classList.toggle('nobar', !barFor(current));
   fitStage(); // le cadre du jeu reprend la place libérée (ou la rend)
 }
 function openSettings() {
@@ -704,7 +724,8 @@ function closeSettings() {
   gear.setAttribute('aria-expanded', 'false');
 }
 gear.addEventListener('click', function () { if (settingsBox.hidden) openSettings(); else closeSettings(); });
-optBanner.addEventListener('change', function () { settings.banner = optBanner.checked; saveSettings(); applySettings(); });
+optBarGame.addEventListener('change', function () { settings.barGame = optBarGame.checked; saveSettings(); applySettings(); });
+optBarSite.addEventListener('change', function () { settings.barSite = optBarSite.checked; saveSettings(); applySettings(); });
 document.addEventListener('click', function (e) {
   if (!settingsBox.hidden && !settingsBox.contains(e.target) && !gear.contains(e.target)) closeSettings();
 });
