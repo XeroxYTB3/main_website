@@ -59,5 +59,15 @@
     "color": "#3ddc97",
     "icon": "star",
     "cta": "Découvrir"
+  },
+  {
+    "id": "devisfacile",
+    "type": "site",
+    "title": "DevisFacile",
+    "desc": "Devis et factures pour micro-entrepreneurs : 100 % local, sans compte, export PDF.",
+    "url": "https://xeroxytb3.github.io/devisfacile/",
+    "color": "#4f7cff",
+    "icon": "star",
+    "cta": "Ouvrir"
   }
 ]
